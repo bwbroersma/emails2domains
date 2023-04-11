@@ -71,8 +71,8 @@ html.dark, html.dark > body {
 		    <label for="emails">Voer hier de emailadressen in:</label><br>
 		    <textarea id="emails" placeholder="info@example.com">
 info@example.com
-security@example.com
-test@example.org
+security@example.org
+test@Example.org
 iemand@example.nl
 example.net
 		    </textarea>
@@ -98,7 +98,7 @@ example.net
         for (i = 0, l = lines.length; i < l; i++) {
            at = lines[i].indexOf("@");
            domain = at > -1 ? lines[i].substr(at + 1): lines[i];
-           domain = domain.trim();
+           domain = domain.trim().toLowerCase();
            if (domain.length == 0) {
                continue;
            }
