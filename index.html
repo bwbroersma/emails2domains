@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Minimize data</title>
+		<meta name="viewport" content="width=600">
+		<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-size: 18px;
+    font-family: Helvetiva, Arial, sans;
+    align-items: center;
+    justify-content: center;
+}
+#output {
+    min-height:11em;
+}
+@media (prefers-color-scheme: light) {
+    html.os-default, html.os-default > body {
+        background-color: #FFFFE0;
+        color: #000;
+    }
+}
+@media (prefers-color-scheme: dark) {
+    html.os-default, html.os-default > body {
+        background-color: #000;
+        color: #FFF;
+    }
+}
+html.light, html.light > body {
+    background-color: #FFFFE0;
+    color: #000;
+}
+html.dark, html.dark > body {
+    background-color: #000;
+    color: #FFF;
+}
+@media all and (max-width:600px) {
+    html, body {
+        font-size: 16px;
+    }
+}
+@media all and (max-width:400px) {
+    html,body {
+        font-size: 14px;
+    }
+}
+			#input, #output {
+				height: 100%;
+				width: 50%;
+				float: left;
+			}
+			textarea {
+				width: 100%;
+				box-sizing: border-box;
+				height: 80%;
+			}
+			button {
+				width: 100%;
+			}
+			body {
+				overflow: hidden;
+				margin: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="input">
+		    <label for="emails">Voer hier de emailadressen in:</label><br>
+		    <textarea id="emails" placeholder="info@example.com">
+info@example.com
+security@example.com
+test@example.org
+iemand@example.nl
+example.net
+		    </textarea>
+		    <button id="mindata">Minimaliseer data</button>
+		</div>
+		<div id="output">
+			<label for="domains">Domeinen:</label><br>
+			<textarea id="domains" readonly="readonly"></textarea>
+			<a href="data:text/csv;charset=utf-8," download="dummy.csv" id="download">Download als CSV</a><br>
+			Gebruik <a href="https://securetransfer.rijkscloud.nl/versturen" target="_blank">SecureTranfer</a> voor het versturen van de CSV.
+		</div>
+		<script>
+(function(){
+    var domEmails = document.getElementById("emails");
+    var domMinimize = document.getElementById("mindata");
+    var domDomains = document.getElementById("domains");
+    var domDownload = document.getElementById("download");
+
+    function minimize() {
+        var lines = domEmails.value.split(/\r?\n/g);
+        var domains = {}, domain, at, i, l;
+        var output = "domein;aantal\r\n";
+        for (i = 0, l = lines.length; i < l; i++) {
+           at = lines[i].indexOf("@");
+           domain = at > -1 ? lines[i].substr(at + 1): lines[i];
+           domain = domain.trim();
+           if (domain.length == 0) {
+               continue;
+           }
+           domains[domain] = (domains[domain] || 0) + 1;
+        }
+        for (domain in domains) {
+            output += domain + ";" + domains[domain] + "\r\n";
+        }
+        domDomains.value = output;
+        domDownload.href = "data:text/csv;charset=utf-8," + escape(output);
+        domDownload.download = "domains-" + (new Date()).toISOString().replaceAll(":",".") + ".csv";
+    }
+
+    domEmails.onchange = minimize;
+    domEmails.onkeyup = minimize;
+    domEmails.onkeydown = minimize;
+    domEmails.onkeypress = minimize;
+    domEmails.onpaste = minimize;
+    domMinimize.onclick = minimize;
+
+    minimize();
+})();
+		</script>
+	</body>
+</html>
